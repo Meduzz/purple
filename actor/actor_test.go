@@ -15,7 +15,9 @@ var (
 	subject *Actor
 )
 
-type Add struct{}
+type (
+	Add struct{}
+)
 
 func (a *Add) Register(vm *otto.Otto) {
 	vm.Set("add", func(call otto.FunctionCall) otto.Value {
@@ -50,7 +52,15 @@ func TestMain(m *testing.M) {
 }
 
 func TestTell(t *testing.T) {
-	evt, err := subject.vm.Object(`({type:"add", add:5})`)
+	data := make(map[string]interface{})
+	data["add"] = 5
+	data["type"] = "add"
+
+	// It seems to handle maps well, json annotated structs, not so much.
+	evt, err := subject.vm.ToValue(data)
+
+	// Clonky solution, and what's up with the paranteses?
+	//	evt, err := subject.vm.Object(`({type:"add", add:5})`)
 
 	if err != nil {
 		t.Fatalf("Evt threw an error %s", err)
