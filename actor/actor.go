@@ -52,3 +52,13 @@ func (a *Actor) Tell(state, evt interface{}) error {
 func (a *Actor) Ask(state, evt interface{}) (interface{}, error) {
 	return a.vm.Call("handle", state, evt)
 }
+
+// Value turn a go map or struct into a js value.
+func (a *Actor) Value(any interface{}) (otto.Value, error) {
+	return a.vm.ToValue(any)
+}
+
+// Object creates an empty js object
+func (a *Actor) Object() (*otto.Object, error) {
+	return a.vm.Object("({})")
+}

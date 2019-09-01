@@ -57,7 +57,7 @@ func TestTell(t *testing.T) {
 	data["type"] = "add"
 
 	// It seems to handle maps well, json annotated structs, not so much.
-	evt, err := subject.vm.ToValue(data)
+	evt, err := subject.Value(data)
 
 	// Clonky solution, and what's up with the paranteses?
 	//	evt, err := subject.vm.Object(`({type:"add", add:5})`)
@@ -66,11 +66,13 @@ func TestTell(t *testing.T) {
 		t.Fatalf("Evt threw an error %s", err)
 	}
 
-	state, err := subject.vm.Object(`({sum:2})`)
+	state, err := subject.Object()
 
 	if err != nil {
 		t.Fatalf("State threw an error %s", err)
 	}
+
+	state.Set("sum", 2)
 
 	err = subject.Tell(state, evt)
 
@@ -96,17 +98,21 @@ func TestTell(t *testing.T) {
 }
 
 func TestAsk(t *testing.T) {
-	evt, err := subject.vm.Object(`({type:"get"})`)
+	evt, err := subject.Object()
 
 	if err != nil {
 		t.Fatalf("Evt threw an error %s", err)
 	}
 
-	state, err := subject.vm.Object(`({sum:7})`)
+	evt.Set("type", "get")
+
+	state, err := subject.Object()
 
 	if err != nil {
 		t.Fatalf("State threw an error %s", err)
 	}
+
+	state.Set("sum", 7)
 
 	value, err := subject.Ask(state, evt)
 
@@ -122,5 +128,17 @@ func TestAsk(t *testing.T) {
 
 	if end != 7 {
 		t.Fatalf("Return was not 7 but %d", end)
+	}
+}
+
+func TestInvalidActorLogic(t *testing.T) {
+	actor, err := system.Actor("I will burn!")
+
+	if err == nil {
+		t.Fatal("Expected an error")
+	}
+
+	if actor != nil {
+		t.Fatal("There should be no actor here")
 	}
 }
