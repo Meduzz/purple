@@ -49,7 +49,7 @@ func (a *Actor) Tell(state, evt interface{}) error {
 }
 
 // Ask - tell the actor about the event, expect an answer.
-func (a *Actor) Ask(state, evt interface{}) (interface{}, error) {
+func (a *Actor) Ask(state, evt interface{}) (otto.Value, error) {
 	return a.vm.Call("handle", state, evt)
 }
 
